@@ -5,18 +5,20 @@ import { PremiumBackground } from "./Components/PremiumBackground";
 import HomePage from "./Home";
 import Footer from "./Components/Footer";
 import CursorPointer from "./Components/CursorPointer";
-import Lenis from "lenis"; 
+import Lenis from "lenis";
+import ServicePage from "./pages/Servicepages/ServicePage";
+import ContactSection from "./pages/Contactpage/ContactSection";
+import About from "./pages/AboutUs/About";
 
 const App = () => {
   useEffect(() => {
-    
     const lenis = new Lenis({
-      duration: 1.4, 
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      duration: 1.4,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
-      smoothWheel: true, 
-      wheelMultiplier: 1, 
+      smoothWheel: true,
+      wheelMultiplier: 1,
     });
 
     function raf(time) {
@@ -45,6 +47,9 @@ const App = () => {
         <main className="flex-1 pt-20">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/services" element={<ServicePage />} />
+            <Route path="/contact" element={<ContactSection />} />
+            <Route path="/about" element={<About />} />
           </Routes>
         </main>
 

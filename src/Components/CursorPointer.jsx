@@ -1,18 +1,9 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 export default function CursorPointer() {
   const canvasRef = useRef(null);
-  const mouse = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
-
-  
-  const ring = useRef({
-    x: 0,
-    y: 0,
-    vx: 0,
-    vy: 0,
-    stiffness: 0.12, 
-    damping: 0.65, 
-  });
+  const pointsRef = useRef([]);
+  const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -26,19 +17,17 @@ export default function CursorPointer() {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    
-    mouse.current = {
+    // Initial mouse center position
+    mouseRef.current = {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
       targetX: window.innerWidth / 2,
       targetY: window.innerHeight / 2,
     };
-    ring.current.x = window.innerWidth / 2;
-    ring.current.y = window.innerHeight / 2;
 
     const handleMouseMove = (e) => {
-      mouse.current.targetX = e.clientX;
-      mouse.current.targetY = e.clientY;
+      mouseRef.current.targetX = e.clientX;
+      mouseRef.current.targetY = e.clientY;
     };
 
     window.addEventListener("mousemove", handleMouseMove);
@@ -47,57 +36,60 @@ export default function CursorPointer() {
 
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const now = Date.now();
+      const m = mouseRef.current;
 
-      const m = mouse.current;
-      const r = ring.current;
+      // Smooth Interpolation (Lerp) for ultra-fluid movement
+      m.x += (m.targetX - m.x) * 0.2;
+      m.y += (m.targetY - m.y) * 0.2;
 
-      
-      m.x += (m.targetX - m.x) * 0.3;
-      m.y += (m.targetY - m.y) * 0.3;
+      // Store smoothed point
+      pointsRef.current.push({ x: m.x, y: m.y, time: now });
 
-      
-      let ax = (m.x - r.x) * r.stiffness;
-      let ay = (m.y - r.y) * r.stiffness;
+      // Trail Duration (2.2 Seconds tak rahega fir fade hoga)
+      const TRAIL_LIFETIME = 2200;
 
-      r.vx = (r.vx + ax) * r.damping;
-      r.vy = (r.vy + ay) * r.damping;
+      // Remove points older than lifetime
+      pointsRef.current = pointsRef.current.filter(
+        (p) => now - p.time <= TRAIL_LIFETIME,
+      );
 
-      r.x += r.vx;
-      r.y += r.vy;
+      const points = pointsRef.current;
 
-      
-      const velocity = Math.sqrt(r.vx * r.vx + r.vy * r.vy);
-      const angle = Math.atan2(r.vy, r.vx);
+      // Draw Light Chocolate Smooth Fine Pen Stroke
+      if (points.length > 1) {
+        for (let i = 1; i < points.length; i++) {
+          const p1 = points[i - 1];
+          const p2 = points[i];
 
-      
-      const stretch = Math.min(velocity * 0.035, 1.2);
+          const age = now - p2.time;
+          const alpha = Math.max(0, 1 - age / TRAIL_LIFETIME);
 
-      
-      ctx.save();
-      ctx.translate(r.x, r.y);
-      ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.moveTo(p1.x, p1.y);
+          ctx.lineTo(p2.x, p2.y);
 
-      
-      ctx.scale(1 + stretch, 1 / (1 + stretch));
+          // Soft Light Chocolate Color (RGB: 155, 105, 70)
+          ctx.strokeStyle = `rgba(155, 105, 70, ${alpha * 0.85})`;
+          ctx.lineWidth = 1.6; // Fine Patla Tip
+          ctx.lineCap = "round";
+          ctx.lineJoin = "round";
 
-      
-      ctx.beginPath();
-      ctx.arc(0, 0, 16, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
-      ctx.fill();
+          // Complete Shadow Removal
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = "transparent";
 
-      
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
+          ctx.stroke();
+        }
+      }
 
-      ctx.restore();
-
-      
-      ctx.beginPath();
-      ctx.arc(m.x, m.y, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = "#ffffff";
-      ctx.fill();
+      // Small Soft Pen Tip Dot
+      if (points.length > 0) {
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, 1.2, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(155, 105, 70, 0.9)";
+        ctx.fill();
+      }
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -122,7 +114,6 @@ export default function CursorPointer() {
         height: "100vh",
         pointerEvents: "none",
         zIndex: 99999,
-        mixBlendMode: "difference", 
       }}
     />
   );

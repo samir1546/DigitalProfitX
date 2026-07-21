@@ -14,7 +14,7 @@ const HomePage = () => {
       <Clients />
       <FlagshipSolution />
       <ClientReviews />
-      <CTASection />
+        <CTASection />
     </div>
   );
 };
