@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
@@ -38,15 +39,15 @@ export default function ContactSection() {
   const whyUsCardRef = useRef(null);
   const pointsRef = useRef([]);
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    service: "",
-    message: "",
-  });
-
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // React Hook Form Setup
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -66,7 +67,7 @@ export default function ContactSection() {
               trigger: headerRef.current,
               start: "top 85%",
             },
-          }
+          },
         );
       }
 
@@ -85,7 +86,7 @@ export default function ContactSection() {
               trigger: leftCardRef.current,
               start: "top 80%",
             },
-          }
+          },
         );
 
         gsap.fromTo(
@@ -101,7 +102,7 @@ export default function ContactSection() {
               trigger: rightCardRef.current,
               start: "top 80%",
             },
-          }
+          },
         );
       }
 
@@ -120,7 +121,7 @@ export default function ContactSection() {
               trigger: whyUsCardRef.current,
               start: "top 85%",
             },
-          }
+          },
         );
       }
 
@@ -141,7 +142,7 @@ export default function ContactSection() {
               trigger: whyUsCardRef.current,
               start: "top 80%",
             },
-          }
+          },
         );
       }
     }, containerRef);
@@ -149,22 +150,12 @@ export default function ContactSection() {
     return () => ctx.revert();
   }, []);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = (data) => {
+    console.log("Form Submitted Data:", data);
     setIsSubmitted(true);
     setTimeout(() => {
       setIsSubmitted(false);
-      setFormData({
-        fullName: "",
-        email: "",
-        phone: "",
-        service: "",
-        message: "",
-      });
+      reset(); // Resets form values
     }, 4500);
   };
 
@@ -183,12 +174,8 @@ export default function ContactSection() {
       <div className="absolute bottom-10 right-10 w-[600px] h-[600px] bg-gradient-to-br from-indigo-200/30 via-purple-100/20 to-teal-100/20 rounded-full blur-[160px] pointer-events-none -z-10" />
 
       <div className="max-w-[1320px] mx-auto px-6 md:px-12 relative z-10 space-y-12 lg:space-y-16">
-        
         {/* Section Header */}
-        <div
-          ref={headerRef}
-          className="text-center max-w-3xl mx-auto"
-        >
+        <div ref={headerRef} className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-5">
             <Sparkles className="w-3.5 h-3.5 text-[#7c3aed] animate-pulse" />
             <p className="text-[11px] font-semibold tracking-[0.22em] uppercase text-gray-600">
@@ -209,20 +196,20 @@ export default function ContactSection() {
           </p>
         </div>
 
-        {/* 2-Column Responsive Layout: Left Form & Right Contact Info */}
+        {/* 2-Column Responsive Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-stretch">
-          
           {/* Left Column: Form Card */}
           <div
             ref={leftCardRef}
-            className="lg:col-span-7 backdrop-blur-[10px]  border border-tl-[2px] rounded-[10px] p-8 sm:p-11 shadow-[0_20px_60px_rgba(0,0,0,0.04)] hover:shadow-[0_30px_70px_rgba(124,58,237,0.08)] transition-all duration-500 relative overflow-hidden flex flex-col justify-between"
+            className="lg:col-span-7 backdrop-blur-[10px] border border-black rounded-[10px] p-8 sm:p-11 shadow-[0_20px_60px_rgba(0,0,0,0.04)] hover:shadow-[0_30px_70px_rgba(124,58,237,0.08)] transition-all duration-500 relative overflow-hidden flex flex-col justify-between"
           >
             <div className="mb-8">
               <h3 className="text-2xl sm:text-3xl font-[myfont] text-gray-900 mb-2 tracking-tight">
                 Send us a message
               </h3>
               <p className="text-xs sm:text-sm text-gray-500 font-normal">
-                Fill out the details below and our strategy team will reach back within 24 hours.
+                Fill out the details below and our strategy team will reach back
+                within 24 hours.
               </p>
             </div>
 
@@ -235,45 +222,61 @@ export default function ContactSection() {
                   Message Sent Successfully
                 </h4>
                 <p className="text-sm text-gray-500 max-w-md">
-                  Thank you for reaching out. A DigitalProfitX growth consultant will contact you shortly.
+                  Thank you for reaching out. A DigitalProfitX growth consultant
+                  will contact you shortly.
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {/* Full Name Input */}
                   <div className="relative group/input">
                     <input
                       type="text"
-                      name="fullName"
-                      required
                       placeholder=" "
-                      value={formData.fullName}
-                      onChange={handleChange}
+                      {...register("fullName", {
+                        required: "Full Name is required",
+                        minLength: {
+                          value: 3,
+                          message: "Minimum 3 characters required",
+                        },
+                      })}
                       className="peer w-full bg-transparent border-b border-black py-3 text-sm text-gray-900 placeholder-transparent focus:outline-none transition-colors duration-300 font-medium"
                     />
                     <label className="absolute left-0 top-3 text-xs font-medium uppercase tracking-wider text-gray-500 pointer-events-none transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-[#7c3aed] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-gray-500">
                       Full Name *
                     </label>
-                    {/* Fixed Single Accent Line on Hover/Focus */}
                     <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7c3aed] to-[#2563eb] transition-all duration-300 group-hover/input:w-full peer-focus:w-full" />
+                    {errors.fullName && (
+                      <span className="text-[11px] font-semibold text-red-500 mt-1 block">
+                        {errors.fullName.message}
+                      </span>
+                    )}
                   </div>
 
                   {/* Email Address Input */}
                   <div className="relative group/input">
                     <input
                       type="email"
-                      name="email"
-                      required
                       placeholder=" "
-                      value={formData.email}
-                      onChange={handleChange}
+                      {...register("email", {
+                        required: "Email is required",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Invalid email address",
+                        },
+                      })}
                       className="peer w-full bg-transparent border-b border-black py-3 text-sm text-gray-900 placeholder-transparent focus:outline-none transition-colors duration-300 font-medium"
                     />
                     <label className="absolute left-0 top-3 text-xs font-medium uppercase tracking-wider text-gray-500 pointer-events-none transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-[#7c3aed] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-gray-500">
                       Email Address *
                     </label>
                     <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7c3aed] to-[#2563eb] transition-all duration-300 group-hover/input:w-full peer-focus:w-full" />
+                    {errors.email && (
+                      <span className="text-[11px] font-semibold text-red-500 mt-1 block">
+                        {errors.email.message}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -282,26 +285,34 @@ export default function ContactSection() {
                   <div className="relative group/input">
                     <input
                       type="tel"
-                      name="phone"
-                      required
                       placeholder=" "
-                      value={formData.phone}
-                      onChange={handleChange}
+                      {...register("phone", {
+                        required: "Phone number is required",
+                        pattern: {
+                          value: /^[0-9+\s-]{8,15}$/,
+                          message: "Invalid phone number",
+                        },
+                      })}
                       className="peer w-full bg-transparent border-b border-black py-3 text-sm text-gray-900 placeholder-transparent focus:outline-none transition-colors duration-300 font-medium"
                     />
                     <label className="absolute left-0 top-3 text-xs font-medium uppercase tracking-wider text-gray-500 pointer-events-none transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:text-[#7c3aed] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:-top-4 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-gray-500">
                       Phone Number *
                     </label>
                     <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7c3aed] to-[#2563eb] transition-all duration-300 group-hover/input:w-full peer-focus:w-full" />
+                    {errors.phone && (
+                      <span className="text-[11px] font-semibold text-red-500 mt-1 block">
+                        {errors.phone.message}
+                      </span>
+                    )}
                   </div>
 
                   {/* Service Interest Dropdown */}
                   <div className="relative group/input">
                     <select
-                      name="service"
-                      required
-                      value={formData.service}
-                      onChange={handleChange}
+                      defaultValue=""
+                      {...register("service", {
+                        required: "Please select a service",
+                      })}
                       className="w-full bg-transparent border-b border-black py-3 text-sm text-gray-900 focus:outline-none transition-colors duration-300 font-medium cursor-pointer"
                     >
                       <option value="" disabled>
@@ -317,34 +328,47 @@ export default function ContactSection() {
                       Service Interest *
                     </label>
                     <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7c3aed] to-[#2563eb] transition-all duration-300 group-hover/input:w-full" />
+                    {errors.service && (
+                      <span className="text-[11px] font-semibold text-red-500 mt-1 block">
+                        {errors.service.message}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* Message Input */}
                 <div className="relative group/input pt-2">
                   <textarea
-                    name="message"
                     rows="3"
                     placeholder=" "
-                    value={formData.message}
-                    onChange={handleChange}
+                    {...register("message", {
+                      required: "Message cannot be empty",
+                    })}
                     className="peer w-full bg-transparent border-b border-gray-300 py-3 text-sm text-gray-900 placeholder-transparent focus:outline-none transition-colors duration-300 font-medium resize-none"
                   />
                   <label className="absolute left-0 top-5 text-xs font-medium uppercase tracking-wider text-gray-500 pointer-events-none transition-all duration-300 peer-focus:-top-2 peer-focus:text-[10px] peer-focus:text-[#7c3aed] peer-focus:font-semibold peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:text-gray-500">
-                    Your Message
+                    Your Message *
                   </label>
                   <div className="absolute bottom-0 left-0 h-[2px] w-0 bg-gradient-to-r from-[#7c3aed] to-[#2563eb] transition-all duration-300 group-hover/input:w-full peer-focus:w-full" />
+                  {errors.message && (
+                    <span className="text-[11px] font-semibold text-red-500 mt-1 block">
+                      {errors.message.message}
+                    </span>
+                  )}
                 </div>
 
                 {/* Submit Button */}
                 <div className="pt-2">
                   <button
                     type="submit"
-                    className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gray-900 px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-white transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_15px_35px_rgba(124,58,237,0.3)] hover:-translate-y-0.5 cursor-pointer"
+                    disabled={isSubmitting}
+                    className="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-gray-900 px-8 py-4 text-xs font-semibold uppercase tracking-[0.18em] text-white transition-all duration-500 shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_15px_35px_rgba(124,58,237,0.3)] hover:-translate-y-0.5 cursor-pointer disabled:opacity-60"
                   >
                     <span className="absolute inset-x-0 bottom-0 h-0 bg-gradient-to-r from-[#7c3aed] to-[#2563eb] transition-all duration-500 ease-in-out group-hover:h-full" />
                     <span className="relative z-10 flex items-center gap-3">
-                      <span>Send Message</span>
+                      <span>
+                        {isSubmitting ? "Sending..." : "Send Message"}
+                      </span>
                       <Send className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-0.5" />
                     </span>
                   </button>
@@ -356,7 +380,7 @@ export default function ContactSection() {
           {/* Right Column: Direct Contact Info */}
           <div
             ref={rightCardRef}
-            className="lg:col-span-5 border  border-black rounded-[10px] p-8 sm:p-11 shadow-[0_20px_50px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(124,58,237,0.08)] transition-all duration-500 flex flex-col justify-between"
+            className="lg:col-span-5 border border-black rounded-[10px] p-8 sm:p-11 shadow-[0_20px_50px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(124,58,237,0.08)] transition-all duration-500 flex flex-col justify-between"
           >
             <div>
               <h3 className="text-2xl font-bold font-[myfont] text-gray-900 mb-6 tracking-tight">
@@ -367,9 +391,9 @@ export default function ContactSection() {
                 {/* Email Item */}
                 <a
                   href="mailto:digitalprofitxofficial@gmail.com"
-                  className="group/item flex items-start gap-4 p-4 rounded-[3px]  border border-black hover:border-[#7c3aed]/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                  className="group/item flex items-start gap-4 p-4 rounded-[3px] border border-black hover:border-[#7c3aed]/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
                 >
-                  <div className="w-10 h-10 rounded-full  text-[#7c3aed] border border-black flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/item:rotate-6 group-hover/item:scale-105">
+                  <div className="w-10 h-10 rounded-full text-[#7c3aed] border border-black flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/item:rotate-6 group-hover/item:scale-105">
                     <Mail className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -386,7 +410,7 @@ export default function ContactSection() {
                 {/* Phone Item */}
                 <a
                   href="tel:+918910056267"
-                  className="group/item flex items-start gap-4 p-4 rounded-[3px]  border border-black hover:border-teal-500/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                  className="group/item flex items-start gap-4 p-4 rounded-[3px] border border-black hover:border-teal-500/30 transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
                 >
                   <div className="w-10 h-10 rounded-full bg-teal-50 text-teal-600 border border-teal-900 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/item:rotate-6 group-hover/item:scale-105">
                     <Phone className="w-5 h-5" />
@@ -403,7 +427,7 @@ export default function ContactSection() {
                 </a>
 
                 {/* Office Item */}
-                <div className="group/item flex items-start gap-4 p-4 rounded-[3px]  border border-black transition-all duration-300 shadow-sm">
+                <div className="group/item flex items-start gap-4 p-4 rounded-[3px] border border-black transition-all duration-300 shadow-sm">
                   <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 border border-blue-800 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/item:rotate-6">
                     <MapPin className="w-5 h-5" />
                   </div>
@@ -418,7 +442,7 @@ export default function ContactSection() {
                 </div>
 
                 {/* Business Hours Item */}
-                <div className="group/item flex items-start gap-4 p-4 rounded-[3px]  border border-black transition-all duration-300 shadow-sm">
+                <div className="group/item flex items-start gap-4 p-4 rounded-[3px] border border-black transition-all duration-300 shadow-sm">
                   <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 border border-amber-800 flex items-center justify-center shrink-0 transition-transform duration-300 group-hover/item:rotate-6">
                     <Clock className="w-5 h-5" />
                   </div>
@@ -434,13 +458,12 @@ export default function ContactSection() {
               </div>
             </div>
           </div>
-
         </div>
 
-        {/* FULL-WIDTH BOTTOM CARD: "Why choose DigitalProfitX?" (Bahar niche rakh diya) */}
+        {/* FULL-WIDTH BOTTOM CARD */}
         <div
           ref={whyUsCardRef}
-          className="w-full  backdrop-blur-[3px] border border-black rounded-[10px] p-8 sm:p-11 shadow-[0_20px_50px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(124,58,237,0.06)] transition-all duration-500"
+          className="w-full backdrop-blur-[3px] border border-black rounded-[10px] p-8 sm:p-11 shadow-[0_20px_50px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(124,58,237,0.06)] transition-all duration-500"
         >
           <div className="max-w-3xl mb-8">
             <h4 className="text-2xl sm:text-3xl font-light font-['Playfair_Display',serif] text-gray-900 tracking-tight">
@@ -456,7 +479,7 @@ export default function ContactSection() {
               <div
                 key={idx}
                 ref={(el) => (pointsRef.current[idx] = el)}
-                className="flex flex-col items-start gap-3 p-5 rounded-[3px]  border border-black shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group/point"
+                className="flex flex-col items-start gap-3 p-5 rounded-[3px] border border-black shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group/point"
               >
                 <div className="w-8 h-8 rounded-xl bg-[#7c3aed]/10 text-[#7c3aed] flex items-center justify-center text-sm shrink-0 font-bold transition-transform duration-300 group-hover/point:scale-110">
                   <Check className="w-4 h-4 stroke-[3]" />
@@ -468,7 +491,6 @@ export default function ContactSection() {
             ))}
           </div>
         </div>
-
       </div>
     </section>
   );

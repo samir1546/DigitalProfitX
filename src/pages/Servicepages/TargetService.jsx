@@ -19,7 +19,7 @@ const specializedServices = [
     icon: FiShoppingCart,
     tag: "Storefront Growth",
     accent: "#7c3aed",
-    glow: "radial-gradient(circle at 50% 0%, rgba(124,58,237,0.12) 0%, transparent 70%)",
+    glow: "radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(124,58,237,0.15), transparent 80%)",
     iconBg: "linear-gradient(135deg, #7c3aed, #4f46e5)",
     mainDescription:
       "Complete end-to-end management of your online stores across major platforms including Amazon, Flipkart, and Meesho with maximum operational speed.",
@@ -38,7 +38,7 @@ const specializedServices = [
     icon: FiSearch,
     tag: "Organic Dominance",
     accent: "#0d9488",
-    glow: "radial-gradient(circle at 50% 0%, rgba(13,148,136,0.12) 0%, transparent 70%)",
+    glow: "radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(13,148,136,0.15), transparent 80%)",
     iconBg: "linear-gradient(135deg, #0d9488, #059669)",
     mainDescription:
       "Data-driven search engine optimization strategies to improve your organic visibility, domain authority, and drive qualified traffic to your website.",
@@ -57,7 +57,7 @@ const specializedServices = [
     icon: FiTarget,
     tag: "Performance Media",
     accent: "#e11d48",
-    glow: "radial-gradient(circle at 50% 0%, rgba(225,29,72,0.12) 0%, transparent 70%)",
+    glow: "radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(225,29,72,0.15), transparent 80%)",
     iconBg: "linear-gradient(135deg, #e11d48, #ea580c)",
     mainDescription:
       "Expert campaign management across Facebook Ads, Google Ads, and YouTube Ads with a ruthless focus on maximizing your return on ad spend (ROAS).",
@@ -76,7 +76,7 @@ const specializedServices = [
     icon: FiTrendingUp,
     tag: "Full-Stack Scale",
     accent: "#9333ea",
-    glow: "radial-gradient(circle at 50% 0%, rgba(147,51,234,0.12) 0%, transparent 70%)",
+    glow: "radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(147,51,234,0.15), transparent 80%)",
     iconBg: "linear-gradient(135deg, #9333ea, #2563eb)",
     mainDescription:
       "Integrated digital marketing packages that combine multiple specialized channels into one synchronized growth flywheel for fast market expansion.",
@@ -98,46 +98,39 @@ export default function TargetService() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 1. Header Scroll Scrub Animation
+      // Header Animation
       if (headerRef.current) {
         gsap.fromTo(
           headerRef.current.children,
-          { opacity: 0, y: 50 },
+          { opacity: 0, y: 35 },
           {
             opacity: 1,
             y: 0,
-            stagger: 0.1,
+            duration: 0.8,
+            stagger: 0.12,
             ease: "power2.out",
             scrollTrigger: {
               trigger: headerRef.current,
-              start: "top 90%",
-              end: "top 55%",
-              scrub: 1,
+              start: "top 85%",
             },
           },
         );
       }
 
-      // 2. Pure Scroll Scrub Animation for Cards (1:1 Scroll Control)
+      // Smooth Entrance Reveal for each card as it enters viewport
       const cards = cardsRef.current.filter(Boolean);
       cards.forEach((card) => {
         gsap.fromTo(
           card,
+          { opacity: 0, y: 80 },
           {
-            y: 80,
-            scale: 0.93,
-            opacity: 0.2,
-          },
-          {
-            y: 0,
-            scale: 1,
             opacity: 1,
-            ease: "power1.out",
+            y: 0,
+            duration: 0.8,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: card,
               start: "top 90%",
-              end: "top 60%",
-              scrub: 1,
             },
           },
         );
@@ -146,6 +139,39 @@ export default function TargetService() {
 
     return () => ctx.revert();
   }, []);
+
+  // Mouse 3D Tilt Effect
+  const handleMouseMove = (e, card) => {
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -4;
+    const rotateY = ((x - centerX) / centerX) * 4;
+
+    card.style.setProperty("--mouse-x", `${x}px`);
+    card.style.setProperty("--mouse-y", `${y}px`);
+    gsap.to(card, {
+      rotateX: rotateX,
+      rotateY: rotateY,
+      duration: 0.3,
+      ease: "power2.out",
+      transformPerspective: 1000,
+    });
+  };
+
+  const handleMouseLeave = (card) => {
+    if (!card) return;
+    gsap.to(card, {
+      rotateX: 0,
+      rotateY: 0,
+      duration: 0.5,
+      ease: "power2.out",
+    });
+  };
 
   return (
     <section
@@ -158,13 +184,12 @@ export default function TargetService() {
 
       {/* Ambient Luxury Background Lights */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[550px] bg-gradient-to-tr from-purple-200/30 via-indigo-100/20 to-teal-100/30 rounded-full blur-[150px] pointer-events-none -z-10" />
-      <div className="absolute bottom-1/3 right-10 w-[600px] h-[600px] bg-gradient-to-br from-pink-100/25 via-purple-100/20 to-indigo-100/20 rounded-full blur-[160px] pointer-events-none -z-10" />
 
       <div className="max-w-[1280px] mx-auto px-6 md:px-12 relative z-10">
         {/* Section Heading */}
         <div
           ref={headerRef}
-          className="text-center max-w-3xl mx-auto mb-16 lg:mb-20"
+          className="text-center max-w-3xl mx-auto mb-16 lg:mb-24"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-gray-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[#7c3aed] animate-pulse" />
@@ -186,25 +211,43 @@ export default function TargetService() {
           </p>
         </div>
 
-        {/* Dynamic Cards Deck synced with Scroll */}
-        <div className="grid grid-cols-1 gap-10 lg:gap-14 max-w-5xl mx-auto">
+        {/* Dynamic Cards Deck with pure Sticky Stacking (One Over Another) */}
+        <div className="flex flex-col gap-12 lg:gap-16 max-w-5xl mx-auto pb-20">
           {specializedServices.map((service, index) => {
             const Icon = service.icon;
+
+            // Offset top distance slightly for each card so they stack cleanly
+            const topStickyOffset = 100 + index * 25;
 
             return (
               <div
                 key={service.id}
                 ref={(el) => (cardsRef.current[index] = el)}
-                className="group relative w-full bg-white/75 backdrop-blur-2xl border border-white/90 rounded-[32px] p-8 sm:p-10 lg:p-11 shadow-[0_20px_60px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_70px_rgba(124,58,237,0.08)] transition-all duration-500 overflow-hidden hover:-translate-y-1.5"
+                onMouseMove={(e) => handleMouseMove(e, cardsRef.current[index])}
+                onMouseLeave={() => handleMouseLeave(cardsRef.current[index])}
+                style={{
+                  position: "sticky",
+                  top: `${topStickyOffset}px`,
+                  zIndex: index + 1,
+                }}
+                className="group relative w-full bg-white/95 backdrop-blur-2xl border border-gray-200/90 rounded-[32px] p-8 sm:p-10 lg:p-11 shadow-[0_15px_45px_rgba(0,0,0,0.05)] hover:shadow-[0_25px_60px_rgba(124,58,237,0.15)] transition-shadow duration-300 overflow-hidden cursor-pointer"
               >
-                {/* Radial Accent Glow on Hover */}
+                {/* Dynamic Mouse Spotlight Glow */}
                 <div
-                  className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10"
+                  className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"
                   style={{ background: service.glow }}
                 />
 
-                {/* Subtle Watermark ID */}
-                <span className="absolute -top-6 -right-2 text-[120px] sm:text-[150px] font-bold font-['Playfair_Display',serif] text-black/[0.02] leading-none pointer-events-none select-none group-hover:text-black/[0.04] transition-colors duration-500">
+                {/* Top Border Accent Line */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[2.5px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `linear-gradient(90deg, transparent, ${service.accent}, transparent)`,
+                  }}
+                />
+
+                {/* Background Watermark Number */}
+                <span className="absolute -top-6 -right-2 text-[120px] sm:text-[150px] font-bold font-['Playfair_Display',serif] text-black/[0.02] leading-none pointer-events-none select-none group-hover:text-black/[0.05] transition-colors duration-500">
                   {service.id}
                 </span>
 
@@ -213,7 +256,7 @@ export default function TargetService() {
                   <div className="flex items-center justify-between gap-4 mb-6 flex-wrap sm:flex-nowrap">
                     <div className="flex items-center gap-4">
                       <div
-                        className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3"
+                        className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md transition-transform duration-300 group-hover:scale-110"
                         style={{ background: service.iconBg }}
                       >
                         <Icon className="w-6 h-6" />
@@ -226,12 +269,12 @@ export default function TargetService() {
 
                     <div className="flex items-center gap-3">
                       <span
-                        className="text-[10px] font-semibold tracking-[0.16em] uppercase px-4 py-1.5 rounded-full border border-black/[0.04] bg-white/80 shadow-xs"
+                        className="text-[10px] font-semibold tracking-[0.16em] uppercase px-4 py-1.5 rounded-full border border-black/[0.05] bg-white shadow-xs"
                         style={{ color: service.accent }}
                       >
                         {service.tag}
                       </span>
-                      <div className="w-8 h-8 rounded-full bg-gray-100/80 text-gray-400 flex items-center justify-center group-hover:bg-[#7c3aed] group-hover:text-white transition-all duration-300">
+                      <div className="w-9 h-9 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center group-hover:bg-[#7c3aed] group-hover:text-white transition-all duration-300 group-hover:scale-110">
                         <ArrowUpRight className="w-4 h-4" />
                       </div>
                     </div>
