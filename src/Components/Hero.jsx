@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
+import { NavLink } from "react-router-dom";
 
 const Hero = () => {
   const heroRef = useRef(null);
 
-  
   const line1Ref = useRef(null);
   const line2Ref = useRef(null);
   const line3Ref = useRef(null);
@@ -18,10 +18,8 @@ const Hero = () => {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-      
       tl.fromTo(
         line1Ref.current,
         { opacity: 0, y: 40, filter: "blur(8px)" },
@@ -31,7 +29,7 @@ const Hero = () => {
           line2Ref.current,
           { opacity: 0, y: 40, filter: "blur(10px)" },
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.0 },
-          "-=0.6", 
+          "-=0.6",
         )
         .fromTo(
           line3Ref.current,
@@ -39,7 +37,7 @@ const Hero = () => {
           { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.8 },
           "-=0.5",
         )
-        
+
         .fromTo(
           paraRef.current,
           { opacity: 0, y: 24 },
@@ -77,7 +75,6 @@ const Hero = () => {
           "-=0.4",
         );
 
-      
       gsap.to(revenueRef.current, {
         y: -10,
         duration: 2.4,
@@ -171,7 +168,8 @@ const Hero = () => {
         </p>
 
         <div ref={btnRef} className="mt-8 opacity-0">
-          <a
+          <NavLink
+            to="/contact"
             className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black px-10 md:px-16 py-3.5 text-[14px] md:text-[15px] font-semibold text-black transition-all"
             style={{
               boxShadow:
@@ -187,7 +185,7 @@ const Hero = () => {
             <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white">
               →
             </span>
-          </a>
+          </NavLink>
         </div>
       </div>
 

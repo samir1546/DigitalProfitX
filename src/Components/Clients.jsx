@@ -109,12 +109,44 @@ const Clients = () => {
   }, []);
 
   // Hover Pause & Resume Handlers
-  const handleMouseEnter = () => {
+  const handleMouseEnterTrack = () => {
     if (tweenRef.current) tweenRef.current.pause();
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeaveTrack = () => {
     if (tweenRef.current) tweenRef.current.play();
+  };
+
+  // Interactive 3D Tilt Effect Handlers
+  const handleMouseMoveCard = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -10; // Max 10 deg tilt
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    gsap.to(card, {
+      rotateX: rotateX,
+      rotateY: rotateY,
+      duration: 0.3,
+      ease: "power2.out",
+      transformPerspective: 1000,
+    });
+  };
+
+  const handleMouseLeaveCard = (e) => {
+    const card = e.currentTarget;
+    gsap.to(card, {
+      rotateX: 0,
+      rotateY: 0,
+      duration: 0.5,
+      ease: "power2.out",
+    });
   };
 
   return (
@@ -144,14 +176,10 @@ const Clients = () => {
 
         {/* Marquee Track Wrapper */}
         <div
-          className="relative w-full overflow-hidden py-4"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          className="relative w-full overflow-hidden py-6"
+          onMouseEnter={handleMouseEnterTrack}
+          onMouseLeave={handleMouseLeaveTrack}
         >
-          {/* Side Gradients for Edge Fade Effect */}
-          <div className="absolute top-0 left-0 bottom-0 w-20 md:w-40 bg-gradient-to-r from-white via-white/80 to-transparent z-10 pointer-events-none" />
-          <div className="absolute top-0 right-0 bottom-0 w-20 md:w-40 bg-gradient-to-l from-white via-white/80 to-transparent z-10 pointer-events-none" />
-
           {/* Sliding Track */}
           <div
             ref={trackRef}
@@ -160,7 +188,10 @@ const Clients = () => {
             {marqueeStats.map((stat, index) => (
               <div
                 key={index}
-                className={`stat-card w-[320px] sm:w-[380px] h-[250px] sm:h-[270px] shrink-0 backdrop-blur-xl border-2 border-dotted border-slate-800/60 rounded-tr-[0px] rounded-bl-[30px] p-7 sm:p-9 flex flex-col justify-between transition-all duration-500 hover:-translate-y-1.5 hover:scale-[1.02] cursor-pointer group relative overflow-hidden ${stat.border} ${stat.hoverShadow}`}
+                onMouseMove={handleMouseMoveCard}
+                onMouseLeave={handleMouseLeaveCard}
+                className={`stat-card w-[320px] sm:w-[380px] h-[250px] sm:h-[270px] shrink-0 backdrop-blur-xl border-2 border-dotted border-slate-800/60 rounded-tr-[0px] rounded-bl-[30px] p-7 sm:p-9 flex flex-col justify-between transition-shadow duration-500 hover:scale-[1.03] cursor-pointer group relative overflow-hidden ${stat.border} ${stat.hoverShadow}`}
+                style={{ transformStyle: "preserve-3d" }}
               >
                 {/* Radial Glow Overlay */}
                 <div

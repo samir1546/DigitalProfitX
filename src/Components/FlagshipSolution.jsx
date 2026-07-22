@@ -8,6 +8,7 @@ import {
   MdOutlineBarChart,
   MdArrowForward,
 } from "react-icons/md";
+import { NavLink } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -51,31 +52,28 @@ const FlagshipSolution = () => {
     let mm = gsap.matchMedia();
 
     mm.add("(min-width: 1024px)", () => {
-      
-      
       gsap.fromTo(
         leftSideRef.current.children,
         {
           opacity: 0,
-          y: 60, 
-          filter: "blur(10px)", 
+          y: 60,
+          filter: "blur(10px)",
         },
         {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
           duration: 1.4,
-          stagger: 0.25, 
-          ease: "power4.out", 
+          stagger: 0.25,
+          ease: "power4.out",
           scrollTrigger: {
             trigger: containerRef.current,
-            start: "top 50%", 
+            start: "top 50%",
             toggleActions: "play none none reverse",
           },
         },
       );
 
-      
       gsap.fromTo(
         ".interactive-row",
         { opacity: 0, x: 50 },
@@ -94,7 +92,6 @@ const FlagshipSolution = () => {
     });
 
     mm.add("(max-width: 1023px)", () => {
-      
       gsap.fromTo(
         leftSideRef.current.children,
         { opacity: 0, y: 30 },
@@ -115,7 +112,6 @@ const FlagshipSolution = () => {
     return () => mm.revert();
   }, []);
 
-  
   const handleMouseEnter = (e, item) => {
     const row = e.currentTarget;
     const text = row.querySelector(".row-text");
@@ -205,14 +201,17 @@ const FlagshipSolution = () => {
             </p>
 
             <div className="pt-2 lg:pt-3">
-              <button className="group relative inline-flex items-center gap-3.5 px-7 py-3.5 lg:px-9 lg:py-4.5 border-t-[2px] font-medium text-sm rounded-full transition-all duration-500 shadow-xl shadow-slate-950/20 overflow-hidden">
+              <NavLink
+                to="/services"
+                className="group relative inline-flex items-center gap-3.5 px-7 py-3.5 lg:px-9 lg:py-4.5 border-t-[2px] font-medium text-sm rounded-full transition-all duration-500 shadow-xl shadow-slate-950/20 overflow-hidden"
+              >
                 <span className="absolute bottom-0 left-0 h-0 w-full text-transparent bg-gradient-to-r from-blue-950 via-blue-700 to-indigo-500  transition-all duration-700 ease-in-out group-hover:h-full"></span>
 
                 <span className="relative z-10 flex items-center gap-2.5 tracking-wide ">
                   Explore Full Package
                   <MdArrowForward className="text-lg transition-transform duration-300 group-hover:translate-x-1.5" />
                 </span>
-              </button>
+              </NavLink>
             </div>
           </div>
 

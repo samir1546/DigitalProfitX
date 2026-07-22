@@ -1,6 +1,7 @@
 import React, { useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { NavLink } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,11 +15,10 @@ const CTASection = () => {
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
-      
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
-          start: "top 90%", 
+          start: "top 90%",
           toggleActions: "play none none reverse",
         },
       });
@@ -36,7 +36,7 @@ const CTASection = () => {
       )
         .fromTo(
           headingRef.current,
-          { opacity: 0, y: 45, skewY: 1.5, filter: "blur(10px)" }, 
+          { opacity: 0, y: 45, skewY: 1.5, filter: "blur(10px)" },
           {
             opacity: 1,
             y: 0,
@@ -45,11 +45,11 @@ const CTASection = () => {
             duration: 0.9,
             ease: "power4.out",
           },
-          "-=0.45", 
+          "-=0.45",
         )
         .fromTo(
           underlineRef.current,
-          { scaleX: 0 }, 
+          { scaleX: 0 },
           { scaleX: 1, duration: 0.8, ease: "power3.out" },
           "-=0.5",
         )
@@ -68,7 +68,7 @@ const CTASection = () => {
         .fromTo(
           btnRef.current,
           { opacity: 0, scale: 0.92, y: 15 },
-          { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.2)" }, 
+          { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.2)" },
           "-=0.4",
         );
     }, containerRef);
@@ -117,16 +117,15 @@ const CTASection = () => {
           and real revenue.
         </p>
 
-        
         <div ref={btnRef} className="mt-10">
-          <a
+          <NavLink
+            to="/services"
             className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-slate-900 px-14 py-4 text-[15px] font-semibold text-black transition-all cursor-pointer shadow-lg hover:shadow-xl duration-300"
             style={{
               boxShadow:
                 "0 4px 24px rgba(0,0,0,0.04), 0 1.5px 4px rgba(0,0,0,0.02)",
             }}
           >
-        
             <span className="absolute bottom-0 left-0 h-0 w-full bg-gradient-to-r from-blue-950 via-blue-700 to-indigo-500 transition-all duration-500 ease-in-out group-hover:h-full"></span>
 
             <span className="relative z-10 transition-colors duration-300 group-hover:text-white tracking-wide">
@@ -136,7 +135,7 @@ const CTASection = () => {
             <span className="relative z-10 transition-transform duration-300 group-hover:translate-x-1 group-hover:text-white">
               →
             </span>
-          </a>
+          </NavLink>
         </div>
       </div>
     </section>
